@@ -12,6 +12,9 @@ use {
     },
 };
 
+#[derive(Debug, Clone)]
+pub struct NotEnoughElementsError;
+
 /// a mostly costless wrapping of a vec, ensuring there's always at least one element
 #[derive(Debug, Clone)]
 pub struct NonEmptyVec<T> {
@@ -21,14 +24,17 @@ pub struct NonEmptyVec<T> {
 impl<T> NonEmptyVec<T> {
 
     #[inline]
-    pub fn as_slice(&self) -> &[T] {
-        &self.vec
+    pub fn len(&self) -> NonZeroUsize {
+        unsafe {
+            NonZeroUsize::new_unchecked(self.vec.len())
+        }
     }
 
     #[inline]
-    pub fn as_mut_slice(&mut self) -> &mut [T] {
-        &mut self.vec
+    pub fn has_len(&self, len: usize) -> bool {
+        self.vec.len() == len
     }
+
     #[inline]
     pub fn first(&self) -> &T {
         unsafe {
@@ -58,16 +64,15 @@ impl<T> NonEmptyVec<T> {
         }
     }
 
+    /// take the first item
     #[inline]
-    pub fn push(&mut self, value: T) {
-        self.vec.push(value);
+    pub fn take(mut self) -> T {
+        self.vec.drain(..).next().unwrap()
     }
 
     #[inline]
-    pub fn len(&mut self) -> NonZeroUsize {
-        unsafe {
-            NonZeroUsize::new_unchecked(self.vec.len())
-        }
+    pub fn push(&mut self, value: T) {
+        self.vec.push(value);
     }
 
     /// Removes the last element from a vector and returns it, or [`None`] if it
@@ -80,17 +85,35 @@ impl<T> NonEmptyVec<T> {
             self.vec.pop()
         }
     }
+
+    #[inline]
+    pub fn as_slice(&self) -> &[T] {
+        &self.vec
+    }
+
+    #[inline]
+    pub fn as_mut_slice(&mut self) -> &mut [T] {
+        &mut self.vec
+    }
+
+    #[inline]
+    pub fn swap_remove(&mut self, idx: usize) -> Result<T, NotEnoughElementsError> {
+        if self.vec.len() == 1 {
+            Err(NotEnoughElementsError)
+        } else {
+            Ok(self.vec.swap_remove(idx))
+        }
+    }
+
 }
 
 
-#[derive(Debug, Clone)]
-pub struct EmptyError;
 impl<T> TryFrom<Vec<T>> for NonEmptyVec<T> {
-    type Error = EmptyError;
+    type Error = NotEnoughElementsError;
     #[inline]
     fn try_from(vec: Vec<T>) -> Result<Self, Self::Error> {
         if vec.is_empty() {
-            Err(EmptyError)
+            Err(NotEnoughElementsError)
         } else {
             Ok(Self {
                 vec,
