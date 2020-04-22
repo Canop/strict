@@ -1,6 +1,6 @@
 [package]
 name = "strict"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["dystroy <denys.seguret@gmail.com>"]
 repository = "https://github.com/Canop/strict"
 description = "NonEmptyVec, a vec guaranteed to hold at least one element"

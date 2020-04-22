@@ -8,7 +8,7 @@ use {
             Index,
             IndexMut,
         },
-        slice::SliceIndex,
+        slice,
     },
 };
 
@@ -107,7 +107,6 @@ impl<T> NonEmptyVec<T> {
 
 }
 
-
 impl<T> TryFrom<Vec<T>> for NonEmptyVec<T> {
     type Error = NotEnoughElementsError;
     #[inline]
@@ -138,7 +137,7 @@ impl<T> Deref for NonEmptyVec<T> {
     }
 }
 
-impl<T, I: SliceIndex<[T]>> Index<I> for NonEmptyVec<T> {
+impl<T, I: slice::SliceIndex<[T]>> Index<I> for NonEmptyVec<T> {
     type Output = I::Output;
     #[inline]
     fn index(&self, index: I) -> &Self::Output {
@@ -146,10 +145,28 @@ impl<T, I: SliceIndex<[T]>> Index<I> for NonEmptyVec<T> {
     }
 }
 
-impl<T, I: SliceIndex<[T]>> IndexMut<I> for NonEmptyVec<T> {
+impl<T, I: slice::SliceIndex<[T]>> IndexMut<I> for NonEmptyVec<T> {
     #[inline]
     fn index_mut(&mut self, index: I) -> &mut Self::Output {
         IndexMut::index_mut(self.as_mut_slice(), index)
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut NonEmptyVec<T> {
+    type Item = &'a mut T;
+    type IntoIter = slice::IterMut<'a, T>;
+    #[inline]
+    fn into_iter(self) -> slice::IterMut<'a, T> {
+        self.vec.iter_mut()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a NonEmptyVec<T> {
+    type Item = &'a T;
+    type IntoIter = slice::Iter<'a, T>;
+    #[inline]
+    fn into_iter(self) -> slice::Iter<'a, T> {
+        self.vec.iter()
     }
 }
 
