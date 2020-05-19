@@ -15,7 +15,10 @@ use {
 #[derive(Debug, Clone)]
 pub struct NotEnoughElementsError;
 
-/// a mostly costless wrapping of a vec, ensuring there's always at least one element
+/// a mostly costless wrapping of a vec, ensuring there's always at least one element.
+///
+/// Follow the semantics of Vec (differing methods have a different name).
+///
 #[derive(Debug, Clone)]
 pub struct NonEmptyVec<T> {
     vec: Vec<T>,
@@ -64,7 +67,7 @@ impl<T> NonEmptyVec<T> {
         }
     }
 
-    /// take the first item
+    /// take the first item, discard the rest
     #[inline]
     pub fn take(mut self) -> T {
         self.vec.drain(..).next().unwrap()
@@ -73,6 +76,11 @@ impl<T> NonEmptyVec<T> {
     #[inline]
     pub fn push(&mut self, value: T) {
         self.vec.push(value);
+    }
+
+    #[inline]
+    pub fn insert(&mut self, insertion_idx: usize, value: T) {
+        self.vec.insert(insertion_idx, value);
     }
 
     /// Removes the last element from a vector and returns it, or [`None`] if it
