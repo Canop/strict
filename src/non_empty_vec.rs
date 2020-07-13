@@ -105,6 +105,15 @@ impl<T> NonEmptyVec<T> {
     }
 
     #[inline]
+    pub fn remove(&mut self, idx: usize) -> Result<T, NotEnoughElementsError> {
+        if self.vec.len() == 1 {
+            Err(NotEnoughElementsError)
+        } else {
+            Ok(self.vec.remove(idx))
+        }
+    }
+
+    #[inline]
     pub fn swap_remove(&mut self, idx: usize) -> Result<T, NotEnoughElementsError> {
         if self.vec.len() == 1 {
             Err(NotEnoughElementsError)
