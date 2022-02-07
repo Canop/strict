@@ -1,19 +1,10 @@
-
-use {
-    std::{
-        convert::TryFrom,
-        num::NonZeroUsize,
-        ops::{
-            Deref,
-            Index,
-            IndexMut,
-        },
-        slice,
-    },
+use std::{
+    num::NonZeroUsize,
+    ops::{Deref, Index, IndexMut},
+    slice,
 };
 
-#[derive(Debug, Clone)]
-pub struct NotEnoughElementsError;
+use crate::NotEnoughElementsError;
 
 /// a mostly costless wrapping of a vec, ensuring there's always at least one element.
 ///
@@ -25,12 +16,9 @@ pub struct NonEmptyVec<T> {
 }
 
 impl<T> NonEmptyVec<T> {
-
     #[inline]
     pub fn len(&self) -> NonZeroUsize {
-        unsafe {
-            NonZeroUsize::new_unchecked(self.vec.len())
-        }
+        unsafe { NonZeroUsize::new_unchecked(self.vec.len()) }
     }
 
     #[inline]
@@ -40,31 +28,23 @@ impl<T> NonEmptyVec<T> {
 
     #[inline]
     pub fn first(&self) -> &T {
-        unsafe {
-            self.vec.get_unchecked(0)
-        }
+        unsafe { self.vec.get_unchecked(0) }
     }
 
     #[inline]
     pub fn first_mut(&mut self) -> &mut T {
-        unsafe {
-            self.vec.get_unchecked_mut(0)
-        }
+        unsafe { self.vec.get_unchecked_mut(0) }
     }
 
     #[inline]
     pub fn last(&self) -> &T {
-        unsafe {
-            self.vec.get_unchecked(self.vec.len() - 1)
-        }
+        unsafe { self.vec.get_unchecked(self.vec.len() - 1) }
     }
 
     #[inline]
     pub fn last_mut(&mut self) -> &mut T {
         let idx = self.vec.len() - 1;
-        unsafe {
-            self.vec.get_unchecked_mut(idx)
-        }
+        unsafe { self.vec.get_unchecked_mut(idx) }
     }
 
     /// take the first item, discard the rest
@@ -121,19 +101,23 @@ impl<T> NonEmptyVec<T> {
             Ok(self.vec.swap_remove(idx))
         }
     }
+}
 
+impl<T> Into<Vec<T>> for NonEmptyVec<T> {
+    fn into(self) -> Vec<T> {
+        self.vec
+    }
 }
 
 impl<T> TryFrom<Vec<T>> for NonEmptyVec<T> {
     type Error = NotEnoughElementsError;
+    
     #[inline]
     fn try_from(vec: Vec<T>) -> Result<Self, Self::Error> {
         if vec.is_empty() {
             Err(NotEnoughElementsError)
         } else {
-            Ok(Self {
-                vec,
-            })
+            Ok(Self { vec })
         }
     }
 }
@@ -141,14 +125,13 @@ impl<T> TryFrom<Vec<T>> for NonEmptyVec<T> {
 impl<T> From<T> for NonEmptyVec<T> {
     #[inline]
     fn from(value: T) -> Self {
-        Self {
-            vec: vec![value],
-        }
+        Self { vec: vec![value] }
     }
 }
 
 impl<T> Deref for NonEmptyVec<T> {
     type Target = [T];
+
     fn deref(&self) -> &[T] {
         self.vec.deref()
     }
@@ -156,6 +139,7 @@ impl<T> Deref for NonEmptyVec<T> {
 
 impl<T, I: slice::SliceIndex<[T]>> Index<I> for NonEmptyVec<T> {
     type Output = I::Output;
+
     #[inline]
     fn index(&self, index: I) -> &Self::Output {
         Index::index(self.as_slice(), index)
@@ -172,6 +156,7 @@ impl<T, I: slice::SliceIndex<[T]>> IndexMut<I> for NonEmptyVec<T> {
 impl<'a, T> IntoIterator for &'a mut NonEmptyVec<T> {
     type Item = &'a mut T;
     type IntoIter = slice::IterMut<'a, T>;
+
     #[inline]
     fn into_iter(self) -> slice::IterMut<'a, T> {
         self.vec.iter_mut()
@@ -181,6 +166,7 @@ impl<'a, T> IntoIterator for &'a mut NonEmptyVec<T> {
 impl<'a, T> IntoIterator for &'a NonEmptyVec<T> {
     type Item = &'a T;
     type IntoIter = slice::Iter<'a, T>;
+
     #[inline]
     fn into_iter(self) -> slice::Iter<'a, T> {
         self.vec.iter()
@@ -189,11 +175,7 @@ impl<'a, T> IntoIterator for &'a NonEmptyVec<T> {
 
 #[cfg(test)]
 mod non_empty_vec_tests {
-
-    use {
-        super::*,
-        std::convert::TryInto,
-    };
+    use {super::*, std::convert::TryInto};
 
     #[test]
     fn test_pop_push() {
@@ -208,4 +190,3 @@ mod non_empty_vec_tests {
         assert_eq!(vec[0], 4);
     }
 }
-
