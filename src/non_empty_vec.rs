@@ -1,15 +1,8 @@
-
-use {
-    std::{
-        convert::TryFrom,
-        num::NonZeroUsize,
-        ops::{
-            Deref,
-            Index,
-            IndexMut,
-        },
-        slice,
-    },
+use std::{
+    convert::TryFrom,
+    num::NonZeroUsize,
+    ops::{Deref, Index, IndexMut},
+    slice,
 };
 
 #[derive(Debug, Clone)]
@@ -25,12 +18,9 @@ pub struct NonEmptyVec<T> {
 }
 
 impl<T> NonEmptyVec<T> {
-
     #[inline]
     pub fn len(&self) -> NonZeroUsize {
-        unsafe {
-            NonZeroUsize::new_unchecked(self.vec.len())
-        }
+        unsafe { NonZeroUsize::new_unchecked(self.vec.len()) }
     }
 
     #[inline]
@@ -40,31 +30,23 @@ impl<T> NonEmptyVec<T> {
 
     #[inline]
     pub fn first(&self) -> &T {
-        unsafe {
-            self.vec.get_unchecked(0)
-        }
+        unsafe { self.vec.get_unchecked(0) }
     }
 
     #[inline]
     pub fn first_mut(&mut self) -> &mut T {
-        unsafe {
-            self.vec.get_unchecked_mut(0)
-        }
+        unsafe { self.vec.get_unchecked_mut(0) }
     }
 
     #[inline]
     pub fn last(&self) -> &T {
-        unsafe {
-            self.vec.get_unchecked(self.vec.len() - 1)
-        }
+        unsafe { self.vec.get_unchecked(self.vec.len() - 1) }
     }
 
     #[inline]
     pub fn last_mut(&mut self) -> &mut T {
         let idx = self.vec.len() - 1;
-        unsafe {
-            self.vec.get_unchecked_mut(idx)
-        }
+        unsafe { self.vec.get_unchecked_mut(idx) }
     }
 
     /// take the first item, discard the rest
@@ -121,7 +103,6 @@ impl<T> NonEmptyVec<T> {
             Ok(self.vec.swap_remove(idx))
         }
     }
-
 }
 
 impl<T> TryFrom<Vec<T>> for NonEmptyVec<T> {
@@ -131,9 +112,7 @@ impl<T> TryFrom<Vec<T>> for NonEmptyVec<T> {
         if vec.is_empty() {
             Err(NotEnoughElementsError)
         } else {
-            Ok(Self {
-                vec,
-            })
+            Ok(Self { vec })
         }
     }
 }
@@ -141,9 +120,7 @@ impl<T> TryFrom<Vec<T>> for NonEmptyVec<T> {
 impl<T> From<T> for NonEmptyVec<T> {
     #[inline]
     fn from(value: T) -> Self {
-        Self {
-            vec: vec![value],
-        }
+        Self { vec: vec![value] }
     }
 }
 
@@ -190,10 +167,7 @@ impl<'a, T> IntoIterator for &'a NonEmptyVec<T> {
 #[cfg(test)]
 mod non_empty_vec_tests {
 
-    use {
-        super::*,
-        std::convert::TryInto,
-    };
+    use {super::*, std::convert::TryInto};
 
     #[test]
     fn test_pop_push() {
@@ -208,4 +182,3 @@ mod non_empty_vec_tests {
         assert_eq!(vec[0], 4);
     }
 }
-

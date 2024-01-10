@@ -1,13 +1,14 @@
 [package]
 name = "strict"
-version = "0.1.4"
+version = "0.2.0"
 authors = ["dystroy <denys.seguret@gmail.com>"]
 repository = "https://github.com/Canop/strict"
-description = "NonEmptyVec, a vec guaranteed to hold at least one element"
-edition = "2018"
+description = "collections with strict bounds"
+edition = "2021"
 keywords = ["vec"]
 license = "MIT"
 categories = []
 readme = "README.md"
+rust-version = "1.56"
 
 [dependencies]

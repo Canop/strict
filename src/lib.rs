@@ -1,7 +1,7 @@
-//! Provide the NonEmptyVec as I wanted it to be.
+//! Provide some types with inherent bounds, useful when you want to avoid unwrap or want const
+//! matching.
 //!
-//! This small lib has better alternatives.
-//! I made it for my own consumption first.
 mod non_empty_vec;
+mod one_to_three;
 
-pub use non_empty_vec::*;
+pub use {non_empty_vec::*, one_to_three::*};
