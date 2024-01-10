@@ -110,6 +110,16 @@ impl<T> OneToThree<T> {
             }
         }
     }
+    pub fn map<B, F>(self, f: F) -> OneToThree<B>
+    where
+        F: Fn(T) -> B,
+    {
+        match self {
+            Self::One(a) => OneToThree::One(f(a)),
+            Self::Two(a, b) => OneToThree::Two(f(a), f(b)),
+            Self::Three(a, b, c) => OneToThree::Three(f(a), f(b), f(c)),
+        }
+    }
 }
 
 impl<T: Clone + Copy> Clone for OneToThree<T> {
@@ -241,5 +251,13 @@ fn test_sort() {
     assert_eq!(
         OneToThree::three(3, 1, 2).sorted(),
         OneToThree::three(1, 2, 3)
+    );
+}
+
+#[test]
+fn test_map() {
+    assert_eq!(
+        OneToThree::three(1, 2, 3).map(|x| x.to_string()),
+        OneToThree::three("1".to_string(), "2".to_string(), "3".to_string()),
     );
 }
