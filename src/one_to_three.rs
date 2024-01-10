@@ -120,6 +120,16 @@ impl<T> OneToThree<T> {
             Self::Three(a, b, c) => OneToThree::Three(f(a), f(b), f(c)),
         }
     }
+    pub fn try_map<B, E, F>(self, f: F) -> Result<OneToThree<B>, E>
+    where
+        F: Fn(T) -> Result<B, E>,
+    {
+        Ok(match self {
+            Self::One(a) => OneToThree::One(f(a)?),
+            Self::Two(a, b) => OneToThree::Two(f(a)?, f(b)?),
+            Self::Three(a, b, c) => OneToThree::Three(f(a)?, f(b)?, f(c)?),
+        })
+    }
 }
 
 impl<T: Clone + Copy> Clone for OneToThree<T> {
@@ -260,4 +270,17 @@ fn test_map() {
         OneToThree::three(1, 2, 3).map(|x| x.to_string()),
         OneToThree::three("1".to_string(), "2".to_string(), "3".to_string()),
     );
+}
+
+#[test]
+fn test_try_map() {
+    assert_eq!(
+        OneToThree::three("1", "-2", "3")
+            .try_map(|x| x.parse())
+            .unwrap(),
+        OneToThree::three(1, -2, 3),
+    );
+    assert!(OneToThree::three("1", "-2", "3")
+        .try_map::<usize, _, _>(|x| x.parse())
+        .is_err());
 }
