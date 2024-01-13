@@ -14,13 +14,8 @@
 
 # strict
 
-Provides the NonEmptyVec, a vec guaranteed to hold at least one element.
+Provides NonEmptyVec and OneToThree.
 
-Probably redundant with other better libs.
-
-Alternatives:
-
-* [non-empty](https://docs.rs/crate/non-empty/0.1.0)
 
 
 
